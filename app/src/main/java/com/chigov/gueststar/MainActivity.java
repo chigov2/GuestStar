@@ -3,8 +3,10 @@ package com.chigov.gueststar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -15,6 +17,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
     private Button button0;
@@ -22,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private Button button2;
     private Button button3;
     private ImageView imageStar;
+
+    private String url = "https://ru.wikipedia.org/wiki/100_%D1%81%D0%B0%D0%BC%D1%8B%D1%85_%D0%B2%D0%BB%D0%B8%D1%8F%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D1%85_%D0%BB%D1%8E%D0%B4%D0%B5%D0%B9_%D0%B2_%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8_(%D0%BA%D0%BD%D0%B8%D0%B3%D0%B0)";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         button2 = findViewById(R.id.button2);
         button3 = findViewById(R.id.button3);
         imageStar = findViewById(R.id.imageStar);
+        getContent();
     }
 
     //создаем два класса - для загрузки изображений и контента
@@ -87,7 +93,9 @@ public class MainActivity extends AppCompatActivity {
                 //открываем соединение
                 urlConnection = (HttpURLConnection) url.openConnection();
                 //получаем поток ввода
-
+                InputStream inputStream = urlConnection.getInputStream();
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                return bitmap;
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -99,6 +107,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             return null;
+        }
+    }
+    //создали классы - создаем метод, которые будут возвращать контент
+    private void getContent(){
+        DownloadContentTask task = new DownloadContentTask();
+        try {
+            String content  = task.execute(url).get();
+            Log.i("test",content);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
