@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageStar;
 
     private String url = "https://www.ivi.ru/titr/motor/best-actors-of-the-21st-century";
+    private String siteNameUrl = "https://www.ivi.ru";
+
 
     private ArrayList<String> urls;
     private ArrayList<String> names;
@@ -125,7 +127,8 @@ public class MainActivity extends AppCompatActivity {
             String content  = task.execute(url).get();
             String start ="Сегодня мы решили посмотреть на красивых и безумно талантливых мужчин-актеров. Очень долго думали, сравнивали, делились впечатлениями и все же остановились на 25 самых-самых. Дабы никого не обидеть, имена указаны в алфавитном порядке.";
             //String finish = "18 июля 2017";
-            String finish = "Алан Рикман: все фильмы";
+            //String finish = ">Элайджа Вуд</a>";
+            String finish = ">18 июля 2017</time>";
             Pattern pattern = Pattern.compile(start + "(.*?)" + finish);
             Matcher matcher = pattern.matcher(content);
             String splitContent = "";
@@ -133,19 +136,29 @@ public class MainActivity extends AppCompatActivity {
                 splitContent = matcher.group(1);
             }
             Pattern patternImg = Pattern.compile("<img src=\"(.*?)\"");
-            Pattern patternName = Pattern.compile("</a> / (.*?)</span><p>");
+            Pattern patternName = Pattern.compile("</a> /(.*?)</span><p>");
+
             Matcher matcherImg = patternImg.matcher(splitContent);
             Matcher matcherName = patternName.matcher(splitContent);
+
             //данные необходимо поместить в массивы
-            while(matcherImg.find())
-            {
-                urls.add(matcherImg.group(1));
-            }while(matcherName.find())
+
+            while(matcherName.find())
             {
                 names.add(matcherName.group(1));
             }
+
+            while(matcherImg.find())
+            {
+                urls.add(matcherImg.group(1));
+            }
+
+//            for (String t : names){
+//               Log.i("test",t);
+//            }
             for (String s : urls){
-                Log.i("test",s);
+                String t =siteNameUrl +s;
+                Log.i("test",t);
             }
             //Log.i("test",splitContent);
         } catch (ExecutionException e) {
