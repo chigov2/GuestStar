@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +29,11 @@ public class MainActivity extends AppCompatActivity {
     private Button button3;
     private ImageView imageStar;
 
-    private String url = "view-source:https://www.ivi.ru/titr/motor/best-actors-of-the-21st-century";
+    private String url = "https://www.ivi.ru/titr/motor/best-actors-of-the-21st-century";
+
+    private ArrayList<String> urls;
+    private ArrayList<String> names;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
         button2 = findViewById(R.id.button2);
         button3 = findViewById(R.id.button3);
         imageStar = findViewById(R.id.imageStar);
+        names = new ArrayList<>();
+        urls = new ArrayList<>();
         getContent();
     }
 
@@ -117,14 +124,30 @@ public class MainActivity extends AppCompatActivity {
         try {
             String content  = task.execute(url).get();
             String start ="Сегодня мы решили посмотреть на красивых и безумно талантливых мужчин-актеров. Очень долго думали, сравнивали, делились впечатлениями и все же остановились на 25 самых-самых. Дабы никого не обидеть, имена указаны в алфавитном порядке.";
-            String finish = "Выделите фрагмент и нажмите Ctrl";
+            //String finish = "18 июля 2017";
+            String finish = "Алан Рикман: все фильмы";
             Pattern pattern = Pattern.compile(start + "(.*?)" + finish);
             Matcher matcher = pattern.matcher(content);
             String splitContent = "";
             while(matcher.find()){
                 splitContent = matcher.group(1);
             }
-            Log.i("test",splitContent);
+            Pattern patternImg = Pattern.compile("<img src=\"(.*?)\"");
+            Pattern patternName = Pattern.compile("</a> / (.*?)</span><p>");
+            Matcher matcherImg = patternImg.matcher(splitContent);
+            Matcher matcherName = patternName.matcher(splitContent);
+            //данные необходимо поместить в массивы
+            while(matcherImg.find())
+            {
+                urls.add(matcherImg.group(1));
+            }while(matcherName.find())
+            {
+                names.add(matcherName.group(1));
+            }
+            for (String s : urls){
+                Log.i("test",s);
+            }
+            //Log.i("test",splitContent);
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
