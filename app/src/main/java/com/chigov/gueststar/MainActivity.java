@@ -18,6 +18,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     private Button button0;
@@ -26,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private Button button3;
     private ImageView imageStar;
 
-    private String url = "https://ru.wikipedia.org/wiki/100_%D1%81%D0%B0%D0%BC%D1%8B%D1%85_%D0%B2%D0%BB%D0%B8%D1%8F%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D1%85_%D0%BB%D1%8E%D0%B4%D0%B5%D0%B9_%D0%B2_%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8_(%D0%BA%D0%BD%D0%B8%D0%B3%D0%B0)";
+    private String url = "view-source:https://www.ivi.ru/titr/motor/best-actors-of-the-21st-century";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +116,15 @@ public class MainActivity extends AppCompatActivity {
         DownloadContentTask task = new DownloadContentTask();
         try {
             String content  = task.execute(url).get();
-            Log.i("test",content);
+            String start ="Сегодня мы решили посмотреть на красивых и безумно талантливых мужчин-актеров. Очень долго думали, сравнивали, делились впечатлениями и все же остановились на 25 самых-самых. Дабы никого не обидеть, имена указаны в алфавитном порядке.";
+            String finish = "Выделите фрагмент и нажмите Ctrl";
+            Pattern pattern = Pattern.compile(start + "(.*?)" + finish);
+            Matcher matcher = pattern.matcher(content);
+            String splitContent = "";
+            while(matcher.find()){
+                splitContent = matcher.group(1);
+            }
+            Log.i("test",splitContent);
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
