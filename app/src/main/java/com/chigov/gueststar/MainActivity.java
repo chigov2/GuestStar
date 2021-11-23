@@ -34,7 +34,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     private ArrayList<String> urls;
+    private ArrayList<String> urls2;
     private ArrayList<String> names;
+
+    private int numberOfQuestion;
+    private int numberOfRightAnswer;
+
+    //все кнопки в один массив
+    private ArrayList<Button> buttons;
 
 
     @Override
@@ -45,10 +52,17 @@ public class MainActivity extends AppCompatActivity {
         button1 = findViewById(R.id.button1);
         button2 = findViewById(R.id.button2);
         button3 = findViewById(R.id.button3);
+        buttons = new ArrayList<>();
+        buttons.add(button0);
+        buttons.add(button1);
+        buttons.add(button2);
+        buttons.add(button3);
         imageStar = findViewById(R.id.imageStar);
         names = new ArrayList<>();
         urls = new ArrayList<>();
+        urls2 = new ArrayList<>();
         getContent();
+        playGame();
     }
 
     //создаем два класса - для загрузки изображений и контента
@@ -143,28 +157,77 @@ public class MainActivity extends AppCompatActivity {
 
             //данные необходимо поместить в массивы
 
-            while(matcherName.find())
-            {
+            while(matcherName.find()){
                 names.add(matcherName.group(1));
             }
 
-            while(matcherImg.find())
-            {
+            while(matcherImg.find()){
                 urls.add(matcherImg.group(1));
+
             }
 
 //            for (String t : names){
 //               Log.i("test",t);
 //            }
-            for (String s : urls){
-                String t =siteNameUrl +s;
-                Log.i("test",t);
+            for (String t : urls){
+                String p =siteNameUrl +t;
+                //Log.i("test",p);
+                urls2.add(p);
             }
-            //Log.i("test",splitContent);
+            for(String i :urls2){
+                Log.i("test",i);
+            }
+
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
+
+    private void playGame(){
+     //необходимо наугад выбрать фото звезды - для этого будет вызываться метод generateQuestion
+        generateQuestion();
+
+        //в зависимости от сгенерированного номера получить картинку
+        DownloadImageTask task = new DownloadImageTask();
+        try {
+            Bitmap bitmap = task.execute(urls2.get(numberOfQuestion)).get();
+            if (bitmap != null)
+            {
+                Log.i("test","OK");
+                imageStar.setImageBitmap(bitmap);
+
+                //создаем цикл, чтобы у кнопок устанавливать текст
+                for (int i = 0; i < buttons.size(); i++){
+                    //
+                    if (i == numberOfRightAnswer){
+                        buttons.get(i).setText(names.get(numberOfQuestion));
+                    }else{
+                        int wrongAnswer = generateWrongAnswer();
+                        buttons.get(i).setText(names.get(wrongAnswer));
+                    }
+
+                }
+            }else{
+
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void generateQuestion(){
+        //номер вопроса должен быть случайным числом в массиве names
+        numberOfQuestion = (int)(Math.random() * names.size());
+        //numberOfRightAnswer - должен быть установлен правильный ответ
+        numberOfRightAnswer = (int)(Math.random() * buttons.size());
+    }
+    //номер неправильного ответа
+    private int generateWrongAnswer(){
+        return (int)(Math.random() * names.size());
+    }
+
 }
