@@ -7,8 +7,10 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -63,6 +65,20 @@ public class MainActivity extends AppCompatActivity {
         urls2 = new ArrayList<>();
         getContent();
         playGame();
+    }
+
+    public void onClickAnswer(View view) {
+        //playGame();
+        //в переменную button записываем картинку с приведением типа
+        Button button = (Button) view;
+        String tag = button.getTag().toString();
+        if (Integer.parseInt(tag) ==numberOfRightAnswer){
+            Toast.makeText(this, "Correct", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "Not correct. Correct answer: " + names.get(numberOfQuestion), Toast.LENGTH_SHORT).show();
+        }
+        playGame();
+
     }
 
     //создаем два класса - для загрузки изображений и контента
@@ -152,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
             Pattern patternImg = Pattern.compile("<img src=\"(.*?)\"");
             Pattern patternName = Pattern.compile("</a> /(.*?)</span><p>");
 
+
             Matcher matcherImg = patternImg.matcher(splitContent);
             Matcher matcherName = patternName.matcher(splitContent);
 
@@ -163,20 +180,18 @@ public class MainActivity extends AppCompatActivity {
 
             while(matcherImg.find()){
                 urls.add(matcherImg.group(1));
-
             }
-
-//            for (String t : names){
-//               Log.i("test",t);
-//            }
-            for (String t : urls){
-                String p =siteNameUrl +t;
-                //Log.i("test",p);
+            for (String t : names){
+               Log.i("test",t);
+            }
+            for (String link : urls){
+                String p =siteNameUrl +link;
+                Log.i("test",p);
                 urls2.add(p);
             }
-            for(String i :urls2){
-                Log.i("test",i);
-            }
+//            for(String i :urls2){
+//                Log.i("test",i);
+//            }
 
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -195,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
             Bitmap bitmap = task.execute(urls2.get(numberOfQuestion)).get();
             if (bitmap != null)
             {
-                Log.i("test","OK");
+                //Log.i("test","OK");
                 imageStar.setImageBitmap(bitmap);
 
                 //создаем цикл, чтобы у кнопок устанавливать текст
@@ -207,10 +222,7 @@ public class MainActivity extends AppCompatActivity {
                         int wrongAnswer = generateWrongAnswer();
                         buttons.get(i).setText(names.get(wrongAnswer));
                     }
-
                 }
-            }else{
-
             }
         } catch (ExecutionException e) {
             e.printStackTrace();
